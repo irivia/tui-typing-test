@@ -55,7 +55,7 @@ int main()
     };
     write_to_buffer(&buffer, test, test_len);
     putchar_to_buffer(&buffer, '\r');
-    int cursor = 0;
+    int test_pos = 0;
     int correct_chars = 0;
     int wrong_chars = 0;
     int extra_chars = 0;
@@ -73,7 +73,7 @@ int main()
     termios.c_lflag &= ~(ECHO | ICANON);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &termios);
 
-    while (cursor < test_len) {
+    while (test_pos < test_len) {
         write(STDIN_FILENO, buffer.data, buffer.pos);
         buffer.pos = 0;
         char c = getchar();
@@ -82,46 +82,46 @@ int main()
             started = true;
         }
         if (c == 127) {
-            if (cursor > 0) {
-                cursor -= 1;
+            if (test_pos > 0) {
+                test_pos -= 1;
                 putchar_to_buffer(&buffer, '\b');
-                putchar_to_buffer(&buffer, test[cursor]);
+                putchar_to_buffer(&buffer, test[test_pos]);
                 putchar_to_buffer(&buffer, '\b');
             }
             continue;
         }
         if (c == CTRL_W) {
-            while (cursor > 0 && test[cursor - 1] != ' ') {
-                cursor -= 1;
+            while (test_pos > 0 && test[test_pos - 1] != ' ') {
+                test_pos -= 1;
                 putchar_to_buffer(&buffer, '\b');
-                putchar_to_buffer(&buffer, test[cursor]);
+                putchar_to_buffer(&buffer, test[test_pos]);
                 putchar_to_buffer(&buffer, '\b');
             }
             continue;
         }
-        if (c == test[cursor]) {
-            putchar_to_buffer(&buffer, test[cursor]);
-            accuracy_map[cursor] = true;
+        if (c == test[test_pos]) {
+            putchar_to_buffer(&buffer, test[test_pos]);
+            accuracy_map[test_pos] = true;
             correct_chars++;
         }
-        else if (cursor < test_len - 1) {
-            if (test[cursor] != ' ') {
+        else if (test_pos < test_len - 1) {
+            if (test[test_pos] != ' ') {
                 putchar_to_buffer(&buffer, 'X');
-                accuracy_map[cursor] = false;
+                accuracy_map[test_pos] = false;
                 wrong_chars++;
             }
             else {
                 putchar_to_buffer(&buffer, 'X');
-                int len = &test[test_len] - &test[cursor + 1];
-                write_to_buffer(&buffer, &test[cursor], len);
+                int len = &test[test_len] - &test[test_pos + 1];
+                write_to_buffer(&buffer, &test[test_pos], len);
                 for (int i = len; i > 0; i--) {
                     putchar_to_buffer(&buffer, '\b');
                 }
-                cursor -= 1;
+                test_pos -= 1;
                 extra_chars++;
             }
         }
-        cursor++;
+        test_pos++;
     }
     end_time = time(0);
 
