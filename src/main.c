@@ -5,6 +5,8 @@
 #include <time.h>
 #include <termios.h>
 
+#define CTRL_W 23
+
 int main()
 {
     char test[] = "the quick brown fox jumps over the lazy dog";
@@ -33,6 +35,15 @@ int main()
         }
         if (c == 127) {
             if (cursor > 0) {
+                cursor -= 1;
+                write(STDIN_FILENO, "\b", 1);
+                write(STDIN_FILENO, &test[cursor], 1);
+                write(STDIN_FILENO, "\b", 1);
+            }
+            continue;
+        }
+        if (c == CTRL_W) {
+            while (cursor > 0 && test[cursor - 1] != ' ') {
                 cursor -= 1;
                 write(STDIN_FILENO, "\b", 1);
                 write(STDIN_FILENO, &test[cursor], 1);
