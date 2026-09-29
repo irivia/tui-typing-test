@@ -55,24 +55,23 @@ int main()
     };
     write_to_buffer(&buffer, test, test_len);
     putchar_to_buffer(&buffer, '\r');
+
     int test_pos = 0;
     int correct_chars = 0;
     int wrong_chars = 0;
     int extra_chars = 0;
-    bool started = false;
-    time_t start_time;
-    time_t end_time;
+
+    time_t start_time, end_time;
     struct termios old_termios, termios;
+
     tcgetattr(STDIN_FILENO, &old_termios);
     termios = old_termios;
-    char input_buf[128];
-    const size_t input_buf_sz = sizeof(input_buf);
-    size_t input_buf_i = 0;
 
     /* disable echo */
     termios.c_lflag &= ~(ECHO | ICANON);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &termios);
 
+    bool started = false;
     while (test_pos < test_len) {
         write(STDIN_FILENO, buffer.data, buffer.pos);
         buffer.pos = 0;
