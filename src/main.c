@@ -26,7 +26,7 @@ int main()
     /* disable echo */
     termios.c_lflag &= ~(ECHO | ICANON);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &termios);
-    
+
     while (cursor < test_len) {
         char c = getchar();
         if (!started) {
@@ -56,10 +56,19 @@ int main()
             accuracy_map[cursor] = true;
             correct++;
         }
-        else {
-            if (cursor < test_len - 1) {
+        else if (cursor < test_len - 1) {
+            if (test[cursor] != ' ') {
                 write(STDIN_FILENO, "X", 1);
                 accuracy_map[cursor] = false;
+            }
+            else {
+                write(STDIN_FILENO, "X", 1);
+                int len = &test[test_len] - &test[cursor + 1];
+                write(STDIN_FILENO, &test[cursor], len);
+                for (int i = len; i > 0; i--) {
+                    write(STDIN_FILENO, "\b", 1);
+                }
+                cursor -= 1;
             }
         }
         cursor++;
