@@ -52,7 +52,7 @@ int main()
             }
             continue;
         }
-        typed++;
+        if (cursor < test_len - 1) typed++;
         if (c == test[cursor]) {
             write(STDIN_FILENO, &test[cursor], 1);
             accuracy_map[cursor] = true;
