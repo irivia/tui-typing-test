@@ -15,6 +15,7 @@ int main()
     write(STDIN_FILENO, test, test_len);
     write(STDIN_FILENO, "\r", 1);
     int cursor = 0;
+    int typed = 0;
     int correct = 0;
     bool started = false;
     time_t start_time;
@@ -51,6 +52,7 @@ int main()
             }
             continue;
         }
+        typed++;
         if (c == test[cursor]) {
             write(STDIN_FILENO, &test[cursor], 1);
             accuracy_map[cursor] = true;
@@ -77,9 +79,9 @@ int main()
 
     tcsetattr(STDIN_FILENO, TCSANOW, &old_termios);
 
-    time_t seconds = end_time - start_time;
-    double speed = (correct / 5.f) * (60.f/seconds);
-
+    const time_t seconds = end_time - start_time;
+    const double speed = (correct / 5.f) * (60.f/seconds);
+    const double accuracy = 100.f/typed * correct;
 
     printf("\n\n");
     for (size_t i = 0; i < test_len; i++) {
@@ -94,7 +96,14 @@ int main()
                 printf("\e[1;31;40m%c\e[0m", c);
         }
     }
-    printf("\n%0.3lf WPM\n", speed);
+    printf("\n------------------------------------\n");
+    printf("               WPM: %0.3lf\n", speed);
+    printf("          Accuracy: %0.3lf%%\n", accuracy);
+    printf("     Total seconds: %ld\n", seconds);
+    printf("  Characters typed: %d\n", typed);
+    printf("  Valid characters: %d\n", correct);
+    printf("Invalid characters: %d\n", typed - correct); 
+
 
     return 0;
 }
