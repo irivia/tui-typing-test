@@ -56,8 +56,9 @@ int main()
     write_to_buffer(&buffer, test, test_len);
     putchar_to_buffer(&buffer, '\r');
     int cursor = 0;
-    int typed = 0;
-    int correct = 0;
+    int correct_chars = 0;
+    int wrong_chars = 0;
+    int extra_chars = 0;
     bool started = false;
     time_t start_time;
     time_t end_time;
@@ -98,16 +99,16 @@ int main()
             }
             continue;
         }
-        if (cursor < test_len - 1) typed++;
         if (c == test[cursor]) {
             putchar_to_buffer(&buffer, test[cursor]);
             accuracy_map[cursor] = true;
-            correct++;
+            correct_chars++;
         }
         else if (cursor < test_len - 1) {
             if (test[cursor] != ' ') {
                 putchar_to_buffer(&buffer, 'X');
                 accuracy_map[cursor] = false;
+                wrong_chars++;
             }
             else {
                 putchar_to_buffer(&buffer, 'X');
@@ -117,6 +118,7 @@ int main()
                     putchar_to_buffer(&buffer, '\b');
                 }
                 cursor -= 1;
+                extra_chars++;
             }
         }
         cursor++;
@@ -125,30 +127,32 @@ int main()
 
     tcsetattr(STDIN_FILENO, TCSANOW, &old_termios);
 
+    const int total_chars = correct_chars + wrong_chars + extra_chars;
     const time_t seconds = end_time - start_time;
-    const double speed = (correct / 5.f) * (60.f/seconds);
-    const double accuracy = 100.f/typed * correct;
+    const double speed = (correct_chars / 5.f) * (60.f/seconds);
+    const double accuracy = 100.f/total_chars * correct_chars;
 
     printf("\n\n");
     for (size_t i = 0; i < test_len; i++) {
         char c = test[i];
         if (accuracy_map[i]) {
-            printf("\e[1;32;40m%c\e[0m", c);
+            printf("\e[1;32;40m%c", c);
         }
         else {
             if (c == ' ')
-                printf("\e[7;31;40m%c\e[0m", c);
+                printf("\e[7;31;40m%c", c);
             else
-                printf("\e[1;31;40m%c\e[0m", c);
+                printf("\e[1;31;40m%c", c);
         }
     }
-    printf("\n------------------------------------\n");
-    printf("               WPM: %0.3lf\n", speed);
-    printf("          Accuracy: %0.3lf%%\n", accuracy);
-    printf("     Total seconds: %ld\n", seconds);
-    printf("  Characters typed: %d\n", typed);
-    printf("  Valid characters: %d\n", correct);
-    printf("Invalid characters: %d\n", typed - correct); 
+    printf("\e[0m\n------------------------------------\n");
+    printf("                 WPM: %0.3lf\n", speed);
+    printf("            Accuracy: %0.3lf%%\n", accuracy);
+    printf("       Total seconds: %ld\n", seconds);
+    printf("    Characters typed: %d\n", total_chars);
+    printf("  Correct characters: %d\n", correct_chars);
+    printf("    Wrong characters: %d\n", wrong_chars); 
+    printf("    Extra characters: %d\n", extra_chars); 
 
 
     return 0;
