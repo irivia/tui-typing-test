@@ -80,22 +80,14 @@ int main()
             start_time = time(0);
             started = true;
         }
-        if (c == 127) {
-            if (test_pos > 0) {
+        if (c == 127 || c == CTRL_W) {
+            do {
+                if (test_pos <= 0) break;
                 test_pos -= 1;
                 putchar_to_buffer(&buffer, '\b');
                 putchar_to_buffer(&buffer, test[test_pos]);
                 putchar_to_buffer(&buffer, '\b');
-            }
-            continue;
-        }
-        if (c == CTRL_W) {
-            while (test_pos > 0 && test[test_pos - 1] != ' ') {
-                test_pos -= 1;
-                putchar_to_buffer(&buffer, '\b');
-                putchar_to_buffer(&buffer, test[test_pos]);
-                putchar_to_buffer(&buffer, '\b');
-            }
+            } while (c == CTRL_W && test[test_pos - 1] != ' ');
             continue;
         }
         if (c == test[test_pos]) {
