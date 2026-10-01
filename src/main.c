@@ -11,7 +11,7 @@
 
 typedef struct {
     char *data;
-    size_t capacity;
+    size_t size;
     size_t pos;
 } Buffer;
 
@@ -20,9 +20,9 @@ void write_to_buffer(Buffer *buffer, char *data, size_t sz)
     assert(buffer != NULL && "Buffer is NULL");
     assert(data != NULL && "Data is NULL");
     
-    if (buffer->pos + sz > buffer->capacity) {
+    if (buffer->pos + sz > buffer->size) {
         fprintf(stderr, "Data of size: %zu exceeds buffer of size: %zu and pos: %zu\n",
-                sz, buffer->capacity, buffer->pos);
+                sz, buffer->size, buffer->pos);
         exit(1);
     }
 
@@ -33,9 +33,9 @@ void write_to_buffer(Buffer *buffer, char *data, size_t sz)
 void putchar_to_buffer(Buffer *buffer, char c)
 {
     assert(buffer != NULL && "Buffer is NULL");
-    if (buffer->pos + 1 > buffer->capacity) {
+    if (buffer->pos + 1 > buffer->size) {
         fprintf(stderr, "Data of size: 1 exceeds buffer of size: %zu and pos: %zu\n",
-                buffer->capacity, buffer->pos);
+                buffer->size, buffer->pos);
         exit(1);
     }
 
@@ -50,7 +50,7 @@ int main()
     char data_buffer[256];
     Buffer buffer = {
         .data = data_buffer,
-        .capacity = sizeof(data_buffer),
+        .size = sizeof(data_buffer),
         .pos = 0
     };
     write_to_buffer(&buffer, test, test_len);
