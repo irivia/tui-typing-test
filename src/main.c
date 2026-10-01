@@ -15,6 +15,30 @@ typedef struct {
     size_t pos;
 } Buffer;
 
+Buffer buffer_new(size_t buffer_size)
+{
+    enum { arena_size = 1024 };
+    static char arena[arena_size];
+    static size_t arena_ptr = 0;
+
+    const size_t new_arena_ptr = arena_ptr + buffer_size;
+
+    if (new_arena_ptr > arena_size) {
+        fprintf(stderr, "Arena(size: %d, ptr: %zu) can't fit Buffer(size: %zu)\n",
+                arena_size, arena_ptr, buffer_size);
+        exit(1);
+    }
+
+    Buffer buffer = {
+        .data = &arena[arena_ptr],
+        .size = buffer_size,
+    };
+
+    arena_ptr = new_arena_ptr;
+
+    return buffer;
+}
+
 void write_to_buffer(Buffer *buffer, char *data, size_t sz)
 {
     assert(buffer != NULL && "Buffer is NULL");
