@@ -6,6 +6,7 @@
 #include <termios.h>
 #include <assert.h>
 #include <string.h>
+#include <stdarg.h>
 
 #define CTRL_W 23
 
@@ -52,6 +53,17 @@ void buffer_write(Buffer *buffer, char *data, size_t sz)
 
     memcpy(&buffer->data[buffer->pos], data, sz);
     buffer->pos += sz;
+}
+
+void buffer_printf(Buffer *buffer, const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+
+    int written = vsnprintf(buffer->data, buffer->size - buffer->pos, format, args);
+    buffer->pos += written;
+
+    va_end(args);
 }
 
 void buffer_putchar(Buffer *buffer, char c)
@@ -103,9 +115,7 @@ int main()
             do {
                 if (test_pos <= 0) break;
                 test_pos -= 1;
-                buffer_putchar(&buffer, '\b');
-                buffer_putchar(&buffer, test[test_pos]);
-                buffer_putchar(&buffer, '\b');
+                buffer_printf(&buffer, "\b%c\b", test[test_pos]);
             } while (c == CTRL_W && test[test_pos - 1] != ' ');
             continue;
         }
