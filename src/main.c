@@ -54,7 +54,7 @@ void buffer_write(Buffer *buffer, char *data, size_t sz)
     buffer->pos += sz;
 }
 
-void putchar_to_buffer(Buffer *buffer, char c)
+void buffer_putchar(Buffer *buffer, char c)
 {
     assert(buffer != NULL && "Buffer is NULL");
     if (buffer->pos + 1 > buffer->size) {
@@ -73,7 +73,7 @@ int main()
     bool accuracy_map[test_len];
     Buffer buffer = buffer_new(256);
     buffer_write(&buffer, test, test_len);
-    putchar_to_buffer(&buffer, '\r');
+    buffer_putchar(&buffer, '\r');
 
     int test_pos = 0;
     int correct_chars = 0;
@@ -103,29 +103,29 @@ int main()
             do {
                 if (test_pos <= 0) break;
                 test_pos -= 1;
-                putchar_to_buffer(&buffer, '\b');
-                putchar_to_buffer(&buffer, test[test_pos]);
-                putchar_to_buffer(&buffer, '\b');
+                buffer_putchar(&buffer, '\b');
+                buffer_putchar(&buffer, test[test_pos]);
+                buffer_putchar(&buffer, '\b');
             } while (c == CTRL_W && test[test_pos - 1] != ' ');
             continue;
         }
         if (c == test[test_pos]) {
-            putchar_to_buffer(&buffer, test[test_pos]);
+            buffer_putchar(&buffer, test[test_pos]);
             accuracy_map[test_pos] = true;
             correct_chars++;
         }
         else if (test_pos < test_len - 1) {
             if (test[test_pos] != ' ') {
-                putchar_to_buffer(&buffer, 'X');
+                buffer_putchar(&buffer, 'X');
                 accuracy_map[test_pos] = false;
                 wrong_chars++;
             }
             else {
-                putchar_to_buffer(&buffer, 'X');
+                buffer_putchar(&buffer, 'X');
                 int len = &test[test_len] - &test[test_pos + 1];
                 buffer_write(&buffer, &test[test_pos], len);
                 for (int i = len; i > 0; i--) {
-                    putchar_to_buffer(&buffer, '\b');
+                    buffer_putchar(&buffer, '\b');
                 }
                 test_pos -= 1;
                 extra_chars++;
