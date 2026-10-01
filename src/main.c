@@ -115,7 +115,7 @@ int main()
             do {
                 if (test_pos <= 0) break;
                 test_pos -= 1;
-                buffer_printf(&buffer, "\b%c\b", test[test_pos]);
+                buffer_write(&buffer, (char[3]){'\b', test[test_pos], '\b' }, 3);
             } while (c == CTRL_W && test[test_pos - 1] != ' ');
             continue;
         }
