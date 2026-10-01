@@ -39,7 +39,7 @@ Buffer buffer_new(size_t buffer_size)
     return buffer;
 }
 
-void write_to_buffer(Buffer *buffer, char *data, size_t sz)
+void buffer_write(Buffer *buffer, char *data, size_t sz)
 {
     assert(buffer != NULL && "Buffer is NULL");
     assert(data != NULL && "Data is NULL");
@@ -72,7 +72,7 @@ int main()
     const size_t test_len = sizeof(test);
     bool accuracy_map[test_len];
     Buffer buffer = buffer_new(256);
-    write_to_buffer(&buffer, test, test_len);
+    buffer_write(&buffer, test, test_len);
     putchar_to_buffer(&buffer, '\r');
 
     int test_pos = 0;
@@ -123,7 +123,7 @@ int main()
             else {
                 putchar_to_buffer(&buffer, 'X');
                 int len = &test[test_len] - &test[test_pos + 1];
-                write_to_buffer(&buffer, &test[test_pos], len);
+                buffer_write(&buffer, &test[test_pos], len);
                 for (int i = len; i > 0; i--) {
                     putchar_to_buffer(&buffer, '\b');
                 }
