@@ -71,12 +71,7 @@ int main()
     char test[] = "the quick brown fox jumps over the lazy dog";
     const size_t test_len = sizeof(test);
     bool accuracy_map[test_len];
-    char data_buffer[256];
-    Buffer buffer = {
-        .data = data_buffer,
-        .size = sizeof(data_buffer),
-        .pos = 0
-    };
+    Buffer buffer = buffer_new(256);
     write_to_buffer(&buffer, test, test_len);
     putchar_to_buffer(&buffer, '\r');
 
