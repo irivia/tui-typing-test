@@ -9,6 +9,7 @@
 #include <stdarg.h>
 
 #define CTRL_W 23
+#define DEL 127
 
 typedef struct {
     char *data;
@@ -111,7 +112,7 @@ int main()
             start_time = time(0);
             started = true;
         }
-        if (c == 127 || c == CTRL_W) {
+        if (c == DEL || c == CTRL_W) {
             do {
                 if (test_pos <= 0) break;
                 test_pos -= 1;
