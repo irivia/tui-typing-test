@@ -85,8 +85,7 @@ int main()
     const size_t test_len = sizeof(test);
     bool accuracy_map[test_len];
     Buffer buffer = buffer_new(256);
-    buffer_write(&buffer, test, test_len);
-    buffer_putchar(&buffer, '\r');
+    buffer_printf(&buffer, "%.*s\r", (int)test_len, test);
 
     int test_pos = 0;
     int correct_chars = 0;
