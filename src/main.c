@@ -80,28 +80,6 @@ void buffer_putchar(Buffer *buffer, char c)
     buffer->data[buffer->pos++] = c;
 }
 
-void build_test_buffer(Buffer *test_buffer, char *test, size_t test_len, uint8_t *accuracy_map)
-{
-    test_buffer->pos = 0;
-    buffer_putchar(test_buffer, '\r');
-    for (size_t i = 0; i < test_len; i++) {
-        uint8_t n = accuracy_map[i];
-        n >>= 1;
-        if (n > 0) {
-            for (uint8_t j = 0; j < n; j++) {
-                buffer_putchar(test_buffer, ' ');
-            }
-            buffer_putchar(test_buffer, ' ');
-        }
-        else {
-            buffer_putchar(test_buffer, test[i]);
-        }
-    }
-    for (size_t i = test_buffer->pos; i < test_buffer->size; i++) {
-            buffer_putchar(test_buffer, ' ');
-    }
-}
-
 void increment_wrong_counter(uint8_t *accuracy_map, size_t len, int i)
 {
     assert(i >= 0 && i < len && "Index is out of bounds");
@@ -122,6 +100,26 @@ int get_wrong_counter(uint8_t *accuracy_map, size_t len, int i)
 {
     assert(i >= 0 && i < len && "Index is out of bounds");
     return accuracy_map[i] >> 1;
+}
+
+void build_test_buffer(Buffer *test_buffer, char *test, size_t test_len, uint8_t *accuracy_map)
+{
+    test_buffer->pos = 0;
+    buffer_putchar(test_buffer, '\r');
+    for (size_t i = 0; i < test_len; i++) {
+        int n = get_wrong_counter(accuracy_map, test_len, i);
+        if (n > 0) {
+            for (uint8_t j = 0; j <= n; j++) {
+                buffer_putchar(test_buffer, ' ');
+            }
+        }
+        else {
+            buffer_putchar(test_buffer, test[i]);
+        }
+    }
+    for (size_t i = test_buffer->pos; i < test_buffer->size; i++) {
+        buffer_putchar(test_buffer, ' ');
+    }
 }
 
 int main()
