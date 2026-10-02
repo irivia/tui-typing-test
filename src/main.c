@@ -80,6 +80,27 @@ void buffer_putchar(Buffer *buffer, char c)
     buffer->data[buffer->pos++] = c;
 }
 
+void build_test_buffer(Buffer *test_buffer, char *test, size_t test_len, uint8_t *accuracy_map)
+{
+    test_buffer->pos = 0;
+    buffer_putchar(test_buffer, '\r');
+    for (size_t i = 0; i < test_len; i++) {
+        uint8_t n = accuracy_map[i];
+        n >>= 1;
+        if (n > 0) {
+            for (uint8_t j = 0; j < n; j++) {
+                buffer_putchar(test_buffer, ' ');
+            }
+            buffer_putchar(test_buffer, ' ');
+        }
+        else {
+            buffer_putchar(test_buffer, test[i]);
+        }
+    }
+    for (size_t i = test_buffer->pos; i < test_buffer->size; i++) {
+            buffer_putchar(test_buffer, ' ');
+    }
+}
 
 void increment_wrong_counter(uint8_t *accuracy_map, size_t len, int i)
 {
@@ -111,8 +132,9 @@ int main()
     for (size_t i = 0; i < test_len; i++) {
         accuracy_map[i] = 0;
     }
-    Buffer buffer = buffer_new(256);
-    buffer_printf(&buffer, "%.*s\r", (int)test_len, test);
+    Buffer test_buffer = buffer_new(test_len * 2);
+    Buffer typed_buffer = buffer_new(test_len * 2);
+    buffer_putchar(&typed_buffer, '\r');
 
     int test_pos = 0;
     int correct_chars = 0;
@@ -131,8 +153,9 @@ int main()
 
     bool started = false;
     while (test_pos < test_len) {
-        write(STDIN_FILENO, buffer.data, buffer.pos);
-        buffer.pos = 0;
+        build_test_buffer(&test_buffer, test, test_len, accuracy_map);
+        write(STDIN_FILENO, test_buffer.data, test_buffer.pos);
+        write(STDIN_FILENO, typed_buffer.data, typed_buffer.pos);
         char c = getchar();
         if (!started) {
             start_time = time(0);
@@ -140,34 +163,30 @@ int main()
         }
         if (c == DEL || c == CTRL_W) {
             do {
-                if (test_pos <= 0) break;
-                test_pos -= 1;
-                buffer_write(&buffer, (char[3]){'\b', test[test_pos], '\b' }, 3);
+                if (test_pos <= 0 || typed_buffer.pos <= 1) break;
+                typed_buffer.pos -= 1;
                 if (get_wrong_counter(accuracy_map, test_len, test_pos) > 0) {
                     decrement_wrong_counter(accuracy_map, test_len, test_pos);
+                }
+                else {
+                    test_pos -= 1;
                 }
             } while (c == CTRL_W && test[test_pos - 1] != ' ');
             continue;
         }
         if (c == test[test_pos]) {
-            buffer_putchar(&buffer, test[test_pos]);
+            buffer_putchar(&typed_buffer, c);
             accuracy_map[test_pos] |= true;
             correct_chars++;
         }
         else if (test_pos < test_len - 1) {
+            buffer_putchar(&typed_buffer, 'X');
             if (test[test_pos] != ' ') {
-                buffer_putchar(&buffer, 'X');
                 accuracy_map[test_pos] = false;
                 wrong_chars++;
             }
             else {
                 increment_wrong_counter(accuracy_map, test_len, test_pos);
-                buffer_putchar(&buffer, 'X');
-                int len = &test[test_len] - &test[test_pos + 1];
-                buffer_write(&buffer, &test[test_pos], len);
-                for (int i = len; i > 0; i--) {
-                    buffer_putchar(&buffer, '\b');
-                }
                 test_pos -= 1;
                 extra_chars++;
             }
