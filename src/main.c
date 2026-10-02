@@ -80,6 +80,29 @@ void buffer_putchar(Buffer *buffer, char c)
     buffer->data[buffer->pos++] = c;
 }
 
+
+void increment_wrong_counter(uint8_t *accuracy_map, size_t len, int i)
+{
+    assert(i >= 0 && i < len && "Index is out of bounds");
+    accuracy_map[i] >>= 1;
+    accuracy_map[i] += 1;
+    accuracy_map[i] <<= 1;
+}
+
+void decrement_wrong_counter(uint8_t *accuracy_map, size_t len, int i)
+{
+    assert(i >= 0 && i < len && "Index is out of bounds");
+    accuracy_map[i] >>= 1;
+    accuracy_map[i] -= 1;
+    accuracy_map[i] <<= 1;
+}
+
+int get_wrong_counter(uint8_t *accuracy_map, size_t len, int i)
+{
+    assert(i >= 0 && i < len && "Index is out of bounds");
+    return accuracy_map[i] >> 1;
+}
+
 int main()
 {
     char test[] = "the quick brown fox jumps over the lazy dog";
@@ -120,12 +143,15 @@ int main()
                 if (test_pos <= 0) break;
                 test_pos -= 1;
                 buffer_write(&buffer, (char[3]){'\b', test[test_pos], '\b' }, 3);
+                if (get_wrong_counter(accuracy_map, test_len, test_pos) > 0) {
+                    decrement_wrong_counter(accuracy_map, test_len, test_pos);
+                }
             } while (c == CTRL_W && test[test_pos - 1] != ' ');
             continue;
         }
         if (c == test[test_pos]) {
             buffer_putchar(&buffer, test[test_pos]);
-            accuracy_map[test_pos] = true;
+            accuracy_map[test_pos] |= true;
             correct_chars++;
         }
         else if (test_pos < test_len - 1) {
@@ -135,6 +161,7 @@ int main()
                 wrong_chars++;
             }
             else {
+                increment_wrong_counter(accuracy_map, test_len, test_pos);
                 buffer_putchar(&buffer, 'X');
                 int len = &test[test_len] - &test[test_pos + 1];
                 buffer_write(&buffer, &test[test_pos], len);
@@ -159,7 +186,7 @@ int main()
     printf("\n\n");
     for (size_t i = 0; i < test_len; i++) {
         char c = test[i];
-        if (accuracy_map[i]) {
+        if (accuracy_map[i] & 1) {
             printf("\e[1;32;40m%c", c);
         }
         else {
