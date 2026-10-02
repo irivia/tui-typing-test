@@ -83,7 +83,7 @@ int main()
 {
     char test[] = "the quick brown fox jumps over the lazy dog";
     const size_t test_len = sizeof(test);
-    bool accuracy_map[test_len];
+    uint8_t accuracy_map[test_len];
     Buffer buffer = buffer_new(256);
     buffer_printf(&buffer, "%.*s\r", (int)test_len, test);
 
