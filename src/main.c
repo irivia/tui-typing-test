@@ -57,17 +57,6 @@ void buffer_write(Buffer *buffer, char *data, size_t sz)
     buffer->pos += sz;
 }
 
-void buffer_printf(Buffer *buffer, const char *format, ...)
-{
-    va_list args;
-    va_start(args, format);
-
-    int written = vsnprintf(buffer->data, buffer->size - buffer->pos, format, args);
-    buffer->pos += written;
-
-    va_end(args);
-}
-
 void buffer_putchar(Buffer *buffer, char c)
 {
     assert(buffer != NULL && "Buffer is NULL");
