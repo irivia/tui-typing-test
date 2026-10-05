@@ -128,7 +128,7 @@ int main()
     int wrong_chars = 0;
     int extra_chars = 0;
 
-    time_t start_time, end_time;
+    struct timespec start_time, end_time;
     struct termios old_termios, termios;
 
     tcgetattr(STDIN_FILENO, &old_termios);
@@ -145,7 +145,7 @@ int main()
         write(STDIN_FILENO, typed_buffer.data, typed_buffer.pos);
         char c = getchar();
         if (!started) {
-            start_time = time(0);
+            clock_gettime(CLOCK_REALTIME, &start_time);
             started = true;
         }
         if (c == DEL || c == CTRL_W) {
@@ -183,13 +183,15 @@ int main()
         }
         test_pos++;
     }
-    end_time = time(0);
+    clock_gettime(CLOCK_REALTIME, &end_time);
 
     tcsetattr(STDIN_FILENO, TCSANOW, &old_termios);
 
-    const int total_chars = correct_chars + wrong_chars + extra_chars;
-    const time_t seconds = end_time - start_time;
+    const int64_t delta_seconds = end_time.tv_sec - start_time.tv_sec;
+    const int64_t delta_nanoseconds = end_time.tv_nsec - start_time.tv_nsec;
+    const double seconds = delta_seconds + (double)delta_nanoseconds/(1000*1000*1000);
     const double speed = (correct_chars / 5.f) * (60.f/seconds);
+    const int total_chars = correct_chars + wrong_chars + extra_chars;
     const double accuracy = 100.f/total_chars * correct_chars;
 
     printf("\n\n");
@@ -208,7 +210,7 @@ int main()
     printf("\e[0m\n------------------------------------\n");
     printf("                 WPM: %0.3lf\n", speed);
     printf("            Accuracy: %0.3lf%%\n", accuracy);
-    printf("       Total seconds: %ld\n", seconds);
+    printf("       Total seconds: %lf\n", seconds);
     printf("    Characters typed: %d\n", total_chars);
     printf("  Correct characters: %d\n", correct_chars);
     printf("    Wrong characters: %d\n", wrong_chars); 
