@@ -113,8 +113,8 @@ void build_test_buffer(Buffer *test_buffer, char *test, size_t test_len, uint8_t
 
 int main()
 {
-    char test[] = "the quick brown fox jumps over the lazy dog";
-    const ssize_t test_len = sizeof(test);
+    char *test = "the quick brown fox jumps over the lazy dog";
+    const ssize_t test_len = strlen(test);
     uint8_t accuracy_map[test_len];
     for (int i = 0; i < test_len; i++) {
         accuracy_map[i] = 0;
