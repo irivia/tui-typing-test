@@ -158,7 +158,7 @@ int main()
                 else {
                     test_pos -= 1;
                 }
-            } while (c == CTRL_W && test[test_pos - 1] != ' ');
+            } while (c == CTRL_W && test_pos > 0 && test[test_pos - 1] != ' ');
             continue;
         }
         if (c == test[test_pos]) {
