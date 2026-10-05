@@ -167,15 +167,18 @@ int main()
             correct_chars++;
         }
         else if (test_pos < test_len - 1) {
-            buffer_putchar(&typed_buffer, 'X');
             if (test[test_pos] != ' ') {
+                buffer_putchar(&typed_buffer, 'X');
                 accuracy_map[test_pos] = false;
                 wrong_chars++;
             }
             else {
-                increment_wrong_counter(accuracy_map, test_len, test_pos);
+                if (get_wrong_counter(accuracy_map, test_len, test_pos) <= 10) {
+                    buffer_putchar(&typed_buffer, 'X');
+                    increment_wrong_counter(accuracy_map, test_len, test_pos);
+                    extra_chars++;
+                }
                 test_pos -= 1;
-                extra_chars++;
             }
         }
         test_pos++;
