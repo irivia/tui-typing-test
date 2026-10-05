@@ -69,7 +69,7 @@ void buffer_putchar(Buffer *buffer, char c)
     buffer->data[buffer->pos++] = c;
 }
 
-void increment_wrong_counter(uint8_t *accuracy_map, size_t len, int i)
+void increment_wrong_counter(uint8_t *accuracy_map, int64_t len, int i)
 {
     assert(i >= 0 && i < len && "Index is out of bounds");
     accuracy_map[i] >>= 1;
@@ -77,7 +77,7 @@ void increment_wrong_counter(uint8_t *accuracy_map, size_t len, int i)
     accuracy_map[i] <<= 1;
 }
 
-void decrement_wrong_counter(uint8_t *accuracy_map, size_t len, int i)
+void decrement_wrong_counter(uint8_t *accuracy_map, int64_t len, int i)
 {
     assert(i >= 0 && i < len && "Index is out of bounds");
     accuracy_map[i] >>= 1;
@@ -85,7 +85,7 @@ void decrement_wrong_counter(uint8_t *accuracy_map, size_t len, int i)
     accuracy_map[i] <<= 1;
 }
 
-int get_wrong_counter(uint8_t *accuracy_map, size_t len, int i)
+int get_wrong_counter(uint8_t *accuracy_map, int64_t len, int i)
 {
     assert(i >= 0 && i < len && "Index is out of bounds");
     return accuracy_map[i] >> 1;
@@ -114,9 +114,9 @@ void build_test_buffer(Buffer *test_buffer, char *test, size_t test_len, uint8_t
 int main()
 {
     char test[] = "the quick brown fox jumps over the lazy dog";
-    const size_t test_len = sizeof(test);
+    const ssize_t test_len = sizeof(test);
     uint8_t accuracy_map[test_len];
-    for (size_t i = 0; i < test_len; i++) {
+    for (int i = 0; i < test_len; i++) {
         accuracy_map[i] = 0;
     }
     Buffer test_buffer = buffer_new(test_len * 4);
@@ -195,7 +195,7 @@ int main()
     const double accuracy = 100.f/total_chars * correct_chars;
 
     printf("\n\n");
-    for (size_t i = 0; i < test_len; i++) {
+    for (int i = 0; i < test_len; i++) {
         char c = test[i];
         if (accuracy_map[i] & 1) {
             printf("\e[1;32;40m%c", c);
