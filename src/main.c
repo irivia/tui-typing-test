@@ -119,8 +119,8 @@ int main()
     for (size_t i = 0; i < test_len; i++) {
         accuracy_map[i] = 0;
     }
-    Buffer test_buffer = buffer_new(test_len * 2);
-    Buffer typed_buffer = buffer_new(test_len * 2);
+    Buffer test_buffer = buffer_new(test_len * 4);
+    Buffer typed_buffer = buffer_new(test_len * 4);
     buffer_putchar(&typed_buffer, '\r');
 
     int test_pos = 0;
