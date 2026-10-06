@@ -107,6 +107,12 @@ void rebuild_test_buffer(Buffer *test_buffer, char *test, size_t test_len, uint8
     }
 }
 
+void display_test(Buffer *test_buffer, Buffer *typed_buffer)
+{
+    write(STDIN_FILENO, test_buffer->data, test_buffer->pos);
+    write(STDIN_FILENO, typed_buffer->data, typed_buffer->pos);
+}
+
 int main()
 {
     char *test = "the quick brown fox jumps over the lazy dog";
@@ -137,8 +143,7 @@ int main()
     bool started = false;
     while (test_pos < test_len) {
         rebuild_test_buffer(&test_buffer, test, test_len, accuracy_map);
-        write(STDIN_FILENO, test_buffer.data, test_buffer.pos);
-        write(STDIN_FILENO, typed_buffer.data, typed_buffer.pos);
+        display_test(&test_buffer, &typed_buffer);
         char c = getchar();
         if (!started) {
             clock_gettime(CLOCK_REALTIME, &start_time);
