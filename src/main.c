@@ -72,17 +72,13 @@ void buffer_putchar(Buffer *buffer, char c)
 void increment_wrong_counter(uint8_t *accuracy_map, int64_t len, int i)
 {
     assert(i >= 0 && i < len && "Index is out of bounds");
-    accuracy_map[i] >>= 1;
-    accuracy_map[i] += 1;
-    accuracy_map[i] <<= 1;
+    accuracy_map[i] += 2;
 }
 
 void decrement_wrong_counter(uint8_t *accuracy_map, int64_t len, int i)
 {
     assert(i >= 0 && i < len && "Index is out of bounds");
-    accuracy_map[i] >>= 1;
-    accuracy_map[i] -= 1;
-    accuracy_map[i] <<= 1;
+    accuracy_map[i] -= 2;
 }
 
 int get_wrong_counter(uint8_t *accuracy_map, int64_t len, int i)
