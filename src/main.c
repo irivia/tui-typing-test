@@ -87,7 +87,7 @@ int get_wrong_counter(uint8_t *accuracy_map, int64_t len, int i)
     return accuracy_map[i] >> 1;
 }
 
-void build_test_buffer(Buffer *test_buffer, char *test, size_t test_len, uint8_t *accuracy_map)
+void rebuild_test_buffer(Buffer *test_buffer, char *test, size_t test_len, uint8_t *accuracy_map)
 {
     test_buffer->pos = 0;
     buffer_putchar(test_buffer, '\r');
@@ -136,7 +136,7 @@ int main()
 
     bool started = false;
     while (test_pos < test_len) {
-        build_test_buffer(&test_buffer, test, test_len, accuracy_map);
+        rebuild_test_buffer(&test_buffer, test, test_len, accuracy_map);
         write(STDIN_FILENO, test_buffer.data, test_buffer.pos);
         write(STDIN_FILENO, typed_buffer.data, typed_buffer.pos);
         char c = getchar();
