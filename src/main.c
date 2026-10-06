@@ -129,6 +129,7 @@ int main()
     int correct_chars = 0;
     int wrong_chars = 0;
     int extra_chars = 0;
+    bool clock_started = false;
 
     struct timespec start_time, end_time;
     struct termios old_termios, termios;
@@ -140,14 +141,14 @@ int main()
     termios.c_lflag &= ~(ECHO | ICANON);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &termios);
 
-    bool started = false;
     while (test_pos < test_len) {
         rebuild_test_buffer(&test_buffer, test, test_len, accuracy_map);
         display_test(&test_buffer, &typed_buffer);
         char c = getchar();
-        if (!started) {
+
+        if (!clock_started) {
             clock_gettime(CLOCK_REALTIME, &start_time);
-            started = true;
+            clock_started = true;
         }
         if (c == DEL || c == CTRL_W) {
             do {
