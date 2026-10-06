@@ -115,41 +115,39 @@ void display_test(Buffer *test_buffer, Buffer *typed_buffer)
 
 int main()
 {
+    struct termios old_termios, termios;
     char *test = "the quick brown fox jumps over the lazy dog";
     const ssize_t test_len = strlen(test);
     uint8_t accuracy_map[test_len];
-    for (int i = 0; i < test_len; i++) {
-        accuracy_map[i] = 0;
-    }
     Buffer test_buffer = buffer_new(test_len * 4);
     Buffer typed_buffer = buffer_new(test_len * 4);
-    buffer_putchar(&typed_buffer, '\r');
-
+    struct timespec start_time, end_time;
     int test_pos = 0;
     int correct_chars = 0;
     int wrong_chars = 0;
     int extra_chars = 0;
     bool clock_started = false;
 
-    struct timespec start_time, end_time;
-    struct termios old_termios, termios;
+    buffer_putchar(&typed_buffer, '\r');
+    for (int i = 0; i < test_len; i++)
+        accuracy_map[i] = 0;
 
     tcgetattr(STDIN_FILENO, &old_termios);
     termios = old_termios;
-
-    /* disable echo */
-    termios.c_lflag &= ~(ECHO | ICANON);
+    termios.c_lflag &= ~(ECHO | ICANON); // disable echo and canonical mode
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &termios);
 
     while (test_pos < test_len) {
         rebuild_test_buffer(&test_buffer, test, test_len, accuracy_map);
         display_test(&test_buffer, &typed_buffer);
+
         char c = getchar();
 
         if (!clock_started) {
             clock_gettime(CLOCK_REALTIME, &start_time);
             clock_started = true;
         }
+
         if (c == DEL || c == CTRL_W) {
             do {
                 if (test_pos <= 0 || typed_buffer.pos <= 1) break;
@@ -163,6 +161,7 @@ int main()
             } while (c == CTRL_W && test_pos > 0 && test[test_pos - 1] != ' ');
             continue;
         }
+
         if (c == test[test_pos]) {
             buffer_putchar(&typed_buffer, c);
             accuracy_map[test_pos] |= true;
@@ -185,9 +184,8 @@ int main()
         }
         test_pos++;
     }
-    clock_gettime(CLOCK_REALTIME, &end_time);
 
-    tcsetattr(STDIN_FILENO, TCSANOW, &old_termios);
+    clock_gettime(CLOCK_REALTIME, &end_time);
 
     const int64_t delta_seconds = end_time.tv_sec - start_time.tv_sec;
     const int64_t delta_nanoseconds = end_time.tv_nsec - start_time.tv_nsec;
@@ -196,6 +194,7 @@ int main()
     const int total_chars = correct_chars + wrong_chars + extra_chars;
     const double accuracy = 100.f/total_chars * correct_chars;
 
+    tcsetattr(STDIN_FILENO, TCSANOW, &old_termios); // resetting terminal
     printf("\n\n");
     for (int i = 0; i < test_len; i++) {
         char c = test[i];
@@ -217,7 +216,6 @@ int main()
     printf("  Correct characters: %d\n", correct_chars);
     printf("    Wrong characters: %d\n", wrong_chars); 
     printf("    Extra characters: %d\n", extra_chars); 
-
 
     return 0;
 }
