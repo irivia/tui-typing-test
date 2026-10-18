@@ -10,13 +10,14 @@ DEBUG=$(BUILD)/typing-test-deb
 
 .PHONY: clean run debug
 
-all: $(BUILD) $(EXE) $(DEBUG)
+all: $(EXE) $(DEBUG)
 
-$(EXE): $(SRC) $(HEADERS)
+$(EXE): $(BUILD) $(SRC) $(HEADERS)
 	$(CC) $(CFLAGS) -o $(EXE) $(SRC) $(LFLAGS)
 
-$(DEBUG): $(SRC) $(HEADERS)
+$(DEBUG): $(BUILD) $(SRC) $(HEADERS)
 	$(CC) $(DFLAGS) -o $(DEBUG) $(SRC) $(LFLAGS)
+	gdb ./$(DEBUG)
 
 run: $(EXE)
 	./$(EXE)
