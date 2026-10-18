@@ -109,8 +109,8 @@ void rebuild_test_buffer(Buffer *test_buffer, char *test, size_t test_len, uint8
 
 void display_test(Buffer *test_buffer, Buffer *typed_buffer)
 {
-    write(STDIN_FILENO, test_buffer->data, test_buffer->pos);
-    write(STDIN_FILENO, typed_buffer->data, typed_buffer->pos);
+    write(STDOUT_FILENO, test_buffer->data, test_buffer->pos);
+    write(STDOUT_FILENO, typed_buffer->data, typed_buffer->pos);
 }
 
 int main()
