@@ -17,13 +17,12 @@ $(EXE): $(BUILD) $(SRC) $(HEADERS)
 
 $(DEBUG): $(BUILD) $(SRC) $(HEADERS)
 	$(CC) $(DFLAGS) -o $(DEBUG) $(SRC) $(LFLAGS)
-	gdb ./$(DEBUG)
 
 run: $(EXE)
 	./$(EXE)
 
 debug: $(DEBUG)
-	./$(DEBUG)
+	gdb ./$(DEBUG)
 
 $(BUILD):
 	mkdir -p $(BUILD)
