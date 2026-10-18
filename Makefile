@@ -8,6 +8,8 @@ BUILD=build
 EXE=$(BUILD)/typing-test
 DEBUG=$(BUILD)/typing-test-deb
 
+.PHONY: clean run debug
+
 all: $(BUILD) $(EXE) $(DEBUG)
 
 $(EXE): $(SRC) $(HEADERS)
@@ -25,6 +27,5 @@ debug: $(DEBUG)
 $(BUILD):
 	mkdir -p $(BUILD)
 
-.PHONY: clean
 clean:
 	rm -rf $(BUILD)
