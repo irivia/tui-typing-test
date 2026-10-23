@@ -12,8 +12,9 @@
 #define CTRL_W 23
 #define DEL 127
 #define COLOR_RESET "\033[0m"
-#define COLOR_RED "\033[1;31;40m"
 #define COLOR_GREEN "\033[1;32;40m"
+#define COLOR_RED "\033[1;31;40m"
+#define COLOR_YELLOW "\033[1;33;40m"
 
 typedef struct {
     char *data;
