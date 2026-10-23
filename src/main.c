@@ -31,6 +31,14 @@ void buffer_adjust_sz(Buffer *buffer, size_t offset)
     buffer->data = (char*)realloc(buffer->data, sizeof(*buffer->data) * buffer->size);
 }
 
+void buffer_free(Buffer *buffer)
+{
+    free(buffer->data);
+    buffer->data = NULL;
+    buffer->size = 0;
+    buffer->pos = 0;
+}
+
 void buffer_write(Buffer *buffer, char *data, size_t sz)
 {
     assert(buffer != NULL && "Buffer is NULL");
