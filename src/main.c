@@ -22,35 +22,22 @@ typedef struct {
     size_t pos;
 } Buffer;
 
-Buffer buffer_new(size_t buffer_size)
+void buffer_adjust_sz(Buffer *buffer, size_t offset)
 {
-    enum { arena_size = 1024 };
-    static char arena[arena_size];
-    static size_t arena_ptr = 0;
+    if (offset + buffer->pos <= buffer->size)
+        return;
 
-    const size_t new_arena_ptr = arena_ptr + buffer_size;
-
-    if (new_arena_ptr > arena_size) {
-        fprintf(stderr, "Arena(size: %d, ptr: %zu) can't fit Buffer(size: %zu)\n",
-                arena_size, arena_ptr, buffer_size);
-        exit(1);
-    }
-
-    Buffer buffer = {
-        .data = &arena[arena_ptr],
-        .size = buffer_size,
-    };
-
-    arena_ptr = new_arena_ptr;
-
-    return buffer;
+    buffer->size = (buffer->size + offset) * 2;
+    buffer->data = (char*)realloc(buffer->data, sizeof(*buffer->data) * buffer->size);
 }
 
 void buffer_write(Buffer *buffer, char *data, size_t sz)
 {
     assert(buffer != NULL && "Buffer is NULL");
     assert(data != NULL && "Data is NULL");
-    
+
+    buffer_adjust_sz(buffer, sz);
+
     if (buffer->pos + sz > buffer->size) {
         fprintf(stderr, "Data of size: %zu exceeds buffer of size: %zu and pos: %zu\n",
                 sz, buffer->size, buffer->pos);
@@ -64,6 +51,9 @@ void buffer_write(Buffer *buffer, char *data, size_t sz)
 void buffer_putchar(Buffer *buffer, char c)
 {
     assert(buffer != NULL && "Buffer is NULL");
+
+    buffer_adjust_sz(buffer, 1);
+
     if (buffer->pos + 1 > buffer->size) {
         fprintf(stderr, "Data of size: 1 exceeds buffer of size: %zu and pos: %zu\n",
                 buffer->size, buffer->pos);
@@ -123,8 +113,8 @@ int main()
     char *test = "the quick brown fox jumps over the lazy dog";
     const ssize_t test_len = strlen(test);
     uint8_t accuracy_map[test_len];
-    Buffer test_buffer = buffer_new(test_len * 4);
-    Buffer typed_buffer = buffer_new(test_len * 4);
+    Buffer test_buffer = {0};
+    Buffer typed_buffer = {0};
     struct timespec start_time, end_time;
     int test_pos = 0;
     int correct_chars = 0;
