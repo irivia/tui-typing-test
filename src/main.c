@@ -11,6 +11,9 @@
 
 #define CTRL_W 23
 #define DEL 127
+#define COLOR_RESET "\033[0m"
+#define COLOR_RED "\033[1;31;40m"
+#define COLOR_GREEN "\033[1;32;40m"
 
 typedef struct {
     char *data;
@@ -199,16 +202,12 @@ int main()
     for (int i = 0; i < test_len; i++) {
         char c = test[i];
         if (accuracy_map[i] & 1) {
-            printf("\033[1;32;40m%c", c);
+            printf(""COLOR_GREEN"%c", c);
         }
-        else {
-            if (c == ' ')
-                printf("\033[7;31;40m%c", c);
-            else
-                printf("\033[1;31;40m%c", c);
-        }
+        else
+            printf(""COLOR_RED"%c", c);
     }
-    printf("\033[0m\n------------------------------------\n");
+    printf(""COLOR_RESET"\n------------------------------------\n");
     printf("                 WPM: %0.3lf\n", speed);
     printf("            Accuracy: %0.3lf%%\n", accuracy);
     printf("       Total seconds: %lf\n", seconds);
