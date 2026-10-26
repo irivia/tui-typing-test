@@ -146,7 +146,7 @@ int main()
         char c = getchar();
 
         if (!clock_started) {
-            clock_gettime(CLOCK_REALTIME, &start_time);
+            clock_gettime(CLOCK_MONOTONIC, &start_time);
             clock_started = true;
         }
 
@@ -187,7 +187,7 @@ int main()
         test_pos++;
     }
 
-    clock_gettime(CLOCK_REALTIME, &end_time);
+    clock_gettime(CLOCK_MONOTONIC, &end_time);
 
     const int64_t delta_seconds = end_time.tv_sec - start_time.tv_sec;
     const int64_t delta_nanoseconds = end_time.tv_nsec - start_time.tv_nsec;
